@@ -2,11 +2,13 @@ from src.parse_map import loadGraph
 from src.congestion_sim import assign_congestion, congestion_color ,save_congestion_map
 from src.shortest_path import custom_Dijkstra, congestion_weight, path_cost
 from src.shortest_path_lib import shortest_path_nx
+from src.visualise import show_folium_map
 
 import streamlit as st
 import osmnx as ox
 import networkx as nx
 import matplotlib.pyplot as plt
+import streamlit_folium as st_folium
 
 #  set the page title
 st.set_page_config(page_title="Traffic Visualizer", layout="centered")
@@ -59,20 +61,12 @@ if st.button("🚗 Find Best Route"):
                     for u, v, k, data in G.edges(data=True, keys=True):  # ✅ CORRECT
                         edge_colors.append(congestion_color(data.get("congestion", 1)))
 
-                    fig, ax = ox.plot_graph_route(           G,
-                        shortest_path,
-                        route_color='blue',
-                        edge_color=edge_colors,
-                        route_linewidth=4,
-                        edge_linewidth=1.5,
-                        node_size= 0,
-                        bgcolor='white',
-                        figsize=(10, 10),
-                        show=False,
-                        close=False
-                    )
-
-                    st.pyplot(fig)
+                    map = show_folium_map(G, shortest_path)
+                    st_folium(map, width=700, height=500, use_container_width=True, fit_bounds=True, zoom=12)
+                    st.markdown("### Path Visualization")
+                    st.write("Click on the map to zoom in and out.")
+                    st.write("The path is highlighted in green.")
+                    st.write("The congestion of each edge is represented by the color of the edge.")
 
                     #show path cost
                     total_cost = path_cost(G,shortest_path)

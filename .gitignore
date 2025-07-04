@@ -16,7 +16,7 @@ data/
 
 # OS / IDE junk
 .DS_Store
-.vscode/
+.vscode/    
 .idea/
 
 # Jupyter
