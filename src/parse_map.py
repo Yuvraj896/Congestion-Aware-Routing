@@ -1,6 +1,12 @@
 import osmnx as ox
 import os
 
+# store graph in cache , no need to rebuild until the location changes
+
+@st.cache_data(show_spinner="Loading map...", persist=True)
+def load_cached_graph(place_name):
+    return loadGraph(place_name)
+
 def loadGraph(place_name, save_dir="data/graph/", image_dir="data/images/"):
     try:
         os.makedirs(save_dir, exist_ok=True)

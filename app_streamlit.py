@@ -1,8 +1,9 @@
-from src.parse_map import loadGraph
+from src.parse_map import loadGraph, load_cached_graph
 from src.congestion_sim import assign_congestion, congestion_color ,save_congestion_map
 from src.shortest_path import custom_Dijkstra, congestion_weight, path_cost
 from src.shortest_path_lib import shortest_path_nx
 from src.visualise import show_folium_map
+from src.suggestions import get_place_suggestion
 
 
 import streamlit as st
@@ -17,13 +18,27 @@ st.title("🚦 Traffic Congestion Visualizer")
 
 place = st.text_input("🗺️ Enter city/place:", value="Indore, India")
 source_loc = st.text_input("📍 Source location:", value="Rajwada Palace, Indore")
+if source_loc:
+    source_suggest = get_place_suggestion(source_loc)
+    source_choice = st.selectbox("🔎 Choose Source", [s[0] for s in source_suggest])
+    source_coord = dict(source_suggest)[source_choice] if source_suggest else None
+else:
+    source_coord = None
+
 target_loc = st.text_input("📍 Destination location:", value="Indore Junction")
+if target_loc:
+    target_suggest = get_place_suggestion(target_loc)
+    target_choice = st.selectbox("🔎 Choose Source", [s[0] for s in target_suggest])
+    target_coord = dict(target_suggest)[target_choice] if target_suggest else None
+else:
+    target_coord = None
+
 
 if st.button("🚗 Find Best Route"):
     if place and source_loc and target_loc:
         with st.spinner("⏳ Loading..."):
             # load the graph
-            G = loadGraph(place)
+            G = load_cached_graph(place)
             
             if G is None:
                 st.error("Error loading graph")
@@ -35,8 +50,10 @@ if st.button("🚗 Find Best Route"):
             save_congestion_map(G, place)
 
             try:
-                source_coord = ox.geocode(f"{source_loc}, {place}")
-                target_coord = ox.geocode(f"{target_loc}, {place}")
+                if not source_coord or not target_coord:
+                    st.warning("⚠️ Please select valid source and destination.")
+                    st.stop()
+
 
 
                 print(f"Source coordinates: {source_coord}")
@@ -68,7 +85,7 @@ if st.button("🚗 Find Best Route"):
 
                     folium_static(map, width=1000, height=650)
 
-                    
+
                     st.markdown("### Path Visualization")
                     st.write("Click on the map to zoom in and out.")
                     st.write("The path is highlighted in green.")
