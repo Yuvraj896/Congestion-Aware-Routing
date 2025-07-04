@@ -4,11 +4,12 @@ from src.shortest_path import custom_Dijkstra, congestion_weight, path_cost
 from src.shortest_path_lib import shortest_path_nx
 from src.visualise import show_folium_map
 
+
 import streamlit as st
 import osmnx as ox
 import networkx as nx
 import matplotlib.pyplot as plt
-import streamlit_folium as st_folium
+from streamlit_folium import folium_static
 
 #  set the page title
 st.set_page_config(page_title="Traffic Visualizer", layout="centered")
@@ -34,8 +35,9 @@ if st.button("🚗 Find Best Route"):
             save_congestion_map(G, place)
 
             try:
-                source_coord = ox.geocode(source_loc)
-                target_coord = ox.geocode(target_loc)
+                source_coord = ox.geocode(f"{source_loc}, {place}")
+                target_coord = ox.geocode(f"{target_loc}, {place}")
+
 
                 print(f"Source coordinates: {source_coord}")
                 print(f"Target coordinates: {target_coord}")
@@ -61,8 +63,12 @@ if st.button("🚗 Find Best Route"):
                     for u, v, k, data in G.edges(data=True, keys=True):  # ✅ CORRECT
                         edge_colors.append(congestion_color(data.get("congestion", 1)))
 
-                    map = show_folium_map(G, shortest_path)
-                    st_folium(map, width=700, height=500, use_container_width=True, fit_bounds=True, zoom=12)
+                    map = show_folium_map(G, shortest_path, place)
+
+
+                    folium_static(map, width=1000, height=650)
+
+                    
                     st.markdown("### Path Visualization")
                     st.write("Click on the map to zoom in and out.")
                     st.write("The path is highlighted in green.")
