@@ -1,0 +1,29 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+
+# Data output and images
+data/
+*.graphml
+*.png
+
+# Streamlit/misc
+.streamlit/
+*.log
+
+# OS / IDE junk
+.DS_Store
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+/cache
+
+parseMap.ipynb
+
+*.ipynb
