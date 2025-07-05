@@ -17,25 +17,31 @@ st.set_page_config(page_title="Traffic Visualizer", layout="centered")
 st.title("🚦 Traffic Congestion Visualizer")
 
 place = st.text_input("🗺️ Enter city/place:", value="Indore, India")
-source_loc = st.text_input("📍 Source location:", value="Rajwada Palace, Indore")
-if source_loc:
-    source_suggest = get_place_suggestion(source_loc)
-    source_choice = st.selectbox("🔎 Choose Source", [s[0] for s in source_suggest])
-    source_coord = dict(source_suggest)[source_choice] if source_suggest else None
-else:
-    source_coord = None
 
-target_loc = st.text_input("📍 Destination location:", value="Indore Junction")
-if target_loc:
-    target_suggest = get_place_suggestion(target_loc)
-    target_choice = st.selectbox("🔎 Choose Source", [s[0] for s in target_suggest])
-    target_coord = dict(target_suggest)[target_choice] if target_suggest else None
-else:
-    target_coord = None
 
+source_query = st.text_input("📍 Type source location")
+source_suggestions = get_place_suggestion(source_query)
+source_selected = None
+source_coords = None
+if source_suggestions:
+    # Show results *inside* selectbox itself
+    source_selected = st.selectbox("📍 Source Location (choose from suggestions)", options=[s[0] for s in source_suggestions])
+    source_coords = dict(source_suggestions).get(source_selected)
+    st.success(f"Selected source: {source_selected}")
+
+target_query = st.text_input("📍 Destination location:")
+target_suggestions = get_place_suggestion(target_query)
+target_selected = None
+target_coords = None
+
+if target_suggestions:
+    # Show results *inside* selectbox itself
+    target_selected = st.selectbox("📍 Destination Location (choose from suggestions)", options=[s[0] for s in target_suggestions])
+    target_coords = dict(target_suggestions).get(target_selected)
+    st.success(f"Selected destination: {target_selected}")
 
 if st.button("🚗 Find Best Route"):
-    if place and source_loc and target_loc:
+    if place and source_query and target_query:
         with st.spinner("⏳ Loading..."):
             # load the graph
             G = load_cached_graph(place)
@@ -50,18 +56,18 @@ if st.button("🚗 Find Best Route"):
             save_congestion_map(G, place)
 
             try:
-                if not source_coord or not target_coord:
+                if not source_coords or not target_coords:
                     st.warning("⚠️ Please select valid source and destination.")
                     st.stop()
 
 
 
-                print(f"Source coordinates: {source_coord}")
-                print(f"Target coordinates: {target_coord}")
+                print(f"Source coordinates: {source_coords}")
+                print(f"Target coordinates: {target_coords}")
 
 
-                source_node = ox.distance.nearest_nodes(G, X=source_coord[1], Y=source_coord[0])
-                target_node = ox.distance.nearest_nodes(G, X=target_coord[1], Y=target_coord[0])
+                source_node = ox.distance.nearest_nodes(G, X=source_coords[1], Y=source_coords[0])
+                target_node = ox.distance.nearest_nodes(G, X=target_coords[1], Y=target_coords[0])
 
 
                 print(f"Source node: {source_node}")
