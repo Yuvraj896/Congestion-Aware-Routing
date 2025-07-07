@@ -20,7 +20,7 @@ place = st.text_input("🗺️ Enter city/place:", value="Indore, India")
 
 
 source_query = st.text_input("📍 Type source location")
-source_suggestions = get_place_suggestion(source_query)
+source_suggestions = get_place_suggestion(source_query, place)
 source_selected = None
 source_coords = None
 if source_suggestions:
@@ -30,7 +30,7 @@ if source_suggestions:
     st.success(f"Selected source: {source_selected}")
 
 target_query = st.text_input("📍 Destination location:")
-target_suggestions = get_place_suggestion(target_query)
+target_suggestions = get_place_suggestion(target_query, place)
 target_selected = None
 target_coords = None
 
