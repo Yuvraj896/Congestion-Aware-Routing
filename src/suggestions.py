@@ -2,8 +2,12 @@ import requests
 import osmnx as ox
 
 def get_bound(place):
-    gdf = ox.geocode_to_gdf(place)
-    return gdf.total_bounds
+    try:
+        gdf = ox.geocode_to_gdf(place)
+        bounds = gdf.total_bounds
+        return bounds
+    except TypeError:
+        return None
 
 
 def get_place_suggestion(query):
@@ -17,7 +21,7 @@ def get_place_suggestion(query):
 
     if query:
         bounds = get_bound(query)
-        if bounds:
+        if bounds is not None:
             west, south, east, north = bounds
             params["viewbox"] = f"{west},{south},{east},{north}"
             params["bounded"] = 1
