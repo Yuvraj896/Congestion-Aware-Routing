@@ -1,5 +1,5 @@
-from src.parse_map import loadGraph, load_cached_graph
-from src.congestion_sim import assign_congestion, congestion_color ,save_congestion_map
+from src.parse_map import load_cached_graph
+from src.congestion_sim import assign_congestion, congestion_color ,save_congestion_map, assign_realtime_congestion
 from src.shortest_path import custom_Dijkstra, congestion_weight, path_cost
 from src.shortest_path_lib import shortest_path_nx
 from src.visualise import show_folium_map
@@ -18,6 +18,7 @@ st.title("🚦 Traffic Congestion Visualizer")
 
 place = st.text_input("🗺️ Enter city/place:", value="Indore, India")
 
+print(place)
 
 source_query = st.text_input("📍 Type source location")
 source_suggestions = get_place_suggestion(source_query, place)
@@ -28,6 +29,9 @@ if source_suggestions:
     source_selected = st.selectbox("📍 Source Location (choose from suggestions)", options=[s[0] for s in source_suggestions])
     source_coords = dict(source_suggestions).get(source_selected)
     st.success(f"Selected source: {source_selected}")
+
+print(f"{source_coords} -> {source_selected}")
+
 
 target_query = st.text_input("📍 Destination location:")
 target_suggestions = get_place_suggestion(target_query, place)
@@ -40,18 +44,29 @@ if target_suggestions:
     target_coords = dict(target_suggestions).get(target_selected)
     st.success(f"Selected destination: {target_selected}")
 
+print(f"{target_coords} -> {target_selected}")
+
+
 if st.button("🚗 Find Best Route"):
     if place and source_query and target_query:
         with st.spinner("⏳ Loading..."):
             # load the graph
-            G = load_cached_graph(place)
+
+            #this loads graph only for the place not for source and dst
+            print("About to load graph for...")
+
+            G = load_cached_graph(source_coords, target_coords)
             
             if G is None:
+                print("In G is None")
+
                 st.error("Error loading graph")
                 st.stop()
 
             # assign congestion to the graph
-            assign_congestion(G)
+            print("Congestion apply")
+            
+            assign_realtime_congestion(G)
 
             save_congestion_map(G, place)
 
