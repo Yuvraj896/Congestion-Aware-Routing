@@ -36,22 +36,45 @@ def save_congestion_map(G, place, save_dir="data/images/"):
     fig.savefig(file_path)
 
 
-def assign_realtime_congestion(G):
+def assign_realtime_congestion(G, maxEdges = None):
+
+    processed = 0
+    seen_coords = {}
+    fallback_congestion = 1.0
+
+    print("Started Assigning")
+    
     for u, v, key, data in G.edges(keys=True, data=True):
+
+        if maxEdges and processed >= maxEdges:
+            break
+
         try:
             lat1,lon1 = G.nodes[u]['y'], G.nodes[u]['x']
             lat2,lon2 = G.nodes[v]['y'], G.nodes[v]['x']
 
             mid_lat = (lat1 + lat2) / 2
             mid_lon = (lon1 + lon2) / 2
+            mid = (mid_lat,mid_lon)
 
-            congestion = get_live_congestion(mid_lat,mid_lon)
+            if mid in seen_coords:
+                congestion = seen_coords[mid]
+            
+            else:
+                congestion = get_live_congestion(mid_lat,mid_lon)
 
-            if congestion > 10: congestion=10
+                if congestion > 10: congestion=10
+                # cache
+                seen_coords[mid] = congestionx
+            
             data['congestion'] = congestion
+            processed += 1
+
+            if processed % 500 == 0:
+                print(f"Processed {processed} edges")
 
         except Exception as e:
             print(f"⚠️ Couldn't assign congestion to edge ({u}-{v}):", e)
-            data['congestion'] = 1  # fallback
+            data['congestion'] = fallback_congestion  # fallback
 
-        print("✅ Real-time congestion assigned to edges")
+    print("✅ Real-time congestion assigned to edges")

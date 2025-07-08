@@ -1,48 +1,42 @@
 import os
 import osmnx as ox
 import streamlit as st
-
-def haversine_midpoint(lat1, lon1, lat2, lon2):
-    return ((lat1 + lat2) / 2.0, (lon1 + lon2) / 2.0)
+import traceback
+from shapely.geometry import box
 
 @st.cache_data(show_spinner="📦 Loading map...", persist=True)
 def load_cached_graph(src, dst):
-    return load_graph_buffered(src, dst)
+    print("🧪 OSMnx version:", ox.__version__)
+    return load_graph(src, dst)
 
-def load_graph_buffered(src, dst, save_dir="data/graph/"):
-    lat1, lon1 = src
-    lat2, lon2 = dst
-
-    # File-safe name
-    file_name = f"{lat1}_{lon1}_{lat2}_{lon2}".replace(".", "_")
-    graph_path = os.path.join(save_dir, f"{file_name}.graphml")
-
-    # If exists already, load it
-    if os.path.exists(graph_path):
-        print("✅ Loaded cached graph")
-        return ox.load_graphml(graph_path)
-
+def load_graph(src, dst, save_dir="data/graph/"):
     try:
-        # Midpoint between source and destination
-        mid_lat, mid_lon = haversine_midpoint(lat1, lon1, lat2, lon2)
+        lat1, lon1 = src
+        lat2, lon2 = dst
 
-        # Distance estimate in degrees → meters
-        dist_deg = max(abs(lat1 - lat2), abs(lon1 - lon2))
-        buffer_m = int(dist_deg * 111000 * 1.5)  # Add margin
-        buffer_m = max(10000, min(buffer_m, 50000))  # clamp between 10km - 50km
+        file_name = f"{lat1}_{lon1}_{lat2}_{lon2}".replace(" ", "_")
+        graph_path = os.path.join(save_dir, file_name)
+    
+        # try cache
+        if(os.path.exists(graph_path)):
+            return ox.load_graphml(graph_path)
+        
 
-        print(f"🧭 Midpoint: ({mid_lat}, {mid_lon}), buffer: {buffer_m} meters")
+        margin  = 0.01
+        north = max(lat1, lat2) + margin
+        south = min(lat1, lat2) - margin
+        east = max(lon1, lon2) + margin
+        west = min(lon1, lon2) - margin
 
-        # Load road network within buffer around midpoint
-        G = ox.graph_from_point((mid_lat, mid_lon), dist=buffer_m, network_type='drive')
+        bbox = (west, south, east, north)
 
-        # Save for future use
+        G = ox.graph_from_bbox(bbox, network_type="drive", simplify=True) 
         os.makedirs(save_dir, exist_ok=True)
         ox.save_graphml(G, filepath=graph_path)
-        print("✅ Graph saved:", graph_path)
 
         return G
-
+        
     except Exception as e:
-        print("❌ Error in load_graph_buffered:", e)
+        print("❌ Error loading graph:", e)
+        traceback.print_exc()
         return None

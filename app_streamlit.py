@@ -30,7 +30,7 @@ if source_suggestions:
     source_coords = dict(source_suggestions).get(source_selected)
     st.success(f"Selected source: {source_selected}")
 
-print(f"{source_coords} -> {source_selected}")
+# print(f"{source_coords} -> {source_selected}")
 
 
 target_query = st.text_input("📍 Destination location:")
@@ -44,7 +44,7 @@ if target_suggestions:
     target_coords = dict(target_suggestions).get(target_selected)
     st.success(f"Selected destination: {target_selected}")
 
-print(f"{target_coords} -> {target_selected}")
+# print(f"{target_coords} -> {target_selected}")
 
 
 if st.button("🚗 Find Best Route"):
@@ -53,20 +53,17 @@ if st.button("🚗 Find Best Route"):
             # load the graph
 
             #this loads graph only for the place not for source and dst
-            print("About to load graph for...")
+            # print("About to load graph for...")
 
             G = load_cached_graph(source_coords, target_coords)
             
-            if G is None:
-                print("In G is None")
 
+            if G is None:
                 st.error("Error loading graph")
                 st.stop()
 
             # assign congestion to the graph
-            print("Congestion apply")
-            
-            assign_realtime_congestion(G)
+            assign_congestion(G)
 
             save_congestion_map(G, place)
 
