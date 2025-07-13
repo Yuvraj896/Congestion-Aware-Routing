@@ -1,7 +1,8 @@
 streamlit
 osmnx
 networkx
-folium
-matplotlib
 requests
+matplotlib
 python-dotenv
+folium
+streamlit-folium
