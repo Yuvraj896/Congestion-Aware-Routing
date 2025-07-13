@@ -1,19 +1,26 @@
 import heapq
 import networkx as nx
 
-def congestion_weight(u, v, data):
-    # min_cost = float('inf')
-    # for k in G[u][v]:  # loop through all edges between u and v
-    #     data = G[u][v][k]
-    #     cost = data.get('length', 1) * data.get('congestion', 1)
-    #     min_cost = min(min_cost, cost)
-    # return min_cost
+# def congestion_weight(u, v, data):
+#     # min_cost = float('inf')
+#     # for k in G[u][v]:  # loop through all edges between u and v
+#     #     data = G[u][v][k]
+#     #     cost = data.get('length', 1) * data.get('congestion', 1)
+#     #     min_cost = min(min_cost, cost)
+#     # return min_cost
     
-    # If this is a MultiGraph, find minimum cost among all parallel edges
-    if isinstance(data, dict) and 'congestion' in data:
-        return data.get('length', 1) * data.get('congestion', 1)
-    else:
-        return 1  # fallback if attributes not found
+#     # If this is a MultiGraph, find minimum cost among all parallel edges
+
+#     if isinstance(data, dict):
+#         return data.get('length', 1.0) * data.get('congestion', 1.0)
+#     return 1.0  # fallback
+
+def congestion_weight(u, v, data):
+    try:
+        return data.get("length", 1.0) * data.get("congestion", 1.0)
+    except Exception as e:
+        print(f"⚠️ congestion_weight error on edge ({u}, {v}):", e)
+        return 1.0
 
 
 def custom_Dijkstra(G, source, target):

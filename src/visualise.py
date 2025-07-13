@@ -14,7 +14,7 @@ def show_folium_map(G, path, city_name):
     ne = [max(p[0] for p in path_coords), max(p[1] for p in path_coords)]
 
     # map build
-    map = folium.Map(location=[mid_lat, mid_lon], zoom_start=15, tiles='OpenStreetMap')
+    map = folium.Map(location=[mid_lat, mid_lon], zoom_start=13, tiles='CartoDB Positron')
 
     #draw route
     folium.PolyLine(path_coords, color='blue', weight=5, opacity=0.9).add_to(map)

@@ -1,0 +1,7 @@
+streamlit
+osmnx
+networkx
+folium
+matplotlib
+requests
+python-dotenv

@@ -5,6 +5,21 @@ from dotenv import load_dotenv
 load_dotenv()
 TOMTOM_API_KEY = os.getenv("TOMTOM_API_KEY")
 
+
+def get_user_city():
+    url = "https://ipinfo.io/json"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        city = data['city']
+        region = data['region']
+        countrt = data['country']
+        return f"{city}, {region}, {countrt}"
+    else:
+        return None
+    
+    
+
 def get_live_congestion(lat, lon):
     url = "https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json"
     params ={
