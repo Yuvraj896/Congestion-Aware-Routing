@@ -3,9 +3,4 @@ osmnx
 networkx
 matplotlib
 folium
-requests
-python-dotenv
-geopandas
-shapely
-pyproj
 streamlit-folium
