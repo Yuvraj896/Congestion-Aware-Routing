@@ -1,8 +1,11 @@
 streamlit
 osmnx
 networkx
-requests
 matplotlib
-python-dotenv
 folium
+requests
+python-dotenv
+geopandas
+shapely
+pyproj
 streamlit-folium
