@@ -52,7 +52,7 @@ def save_congestion_map(G, place, save_dir="data/images/"):
     print("Saving congestion map to:", file_path)
 
     # fig.savefig(file_path)
-    st.pyplot(fig)
+    # st.pyplot(fig)
 
 
 def assign_realtime_congestion(G, maxEdges = None):
