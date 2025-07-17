@@ -1,6 +1,7 @@
 import random
 import osmnx as ox
 import json, os
+import streamlit as st
 
 from src.live_traffic import get_live_congestion
 
@@ -50,7 +51,8 @@ def save_congestion_map(G, place, save_dir="data/images/"):
     file_path = os.path.join(save_dir, f"{place}_congestion_map.png")
     print("Saving congestion map to:", file_path)
 
-    fig.savefig(file_path)
+    # fig.savefig(file_path)
+    st.pyplot(fig)
 
 
 def assign_realtime_congestion(G, maxEdges = None):
